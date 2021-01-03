@@ -87,6 +87,9 @@ def create_app(test_config=None):
     question_nr = len(questions)
     selected_questions = paginate_questions(request, questions)
 
+    if len(selected_questions) == 0:
+      abort (404)
+
     # Get all categories
     categories = Category.query.order_by(Category.id).all()
     categories_dict = {}
@@ -122,10 +125,7 @@ def create_app(test_config=None):
     '''
     try:
       question = Question.query.filter(Question.id == question_id).one_or_none()
-
-      if question is None:
-          abort(404)
-
+      
       question.delete()
       selection = Question.query.order_by(Question.id).all()
       current_questions = paginate_questions(request, selection)
@@ -168,6 +168,7 @@ def create_app(test_config=None):
         answer=body.get('answer'), 
         category=body.get('category'),
         difficulty=body.get('difficulty'))
+      
       # insert to database
       new_question.insert()
 
@@ -182,7 +183,7 @@ def create_app(test_config=None):
           'question_created': new_question.question,
           'questions': current_questions,
           'total_questions': len(Question.query.all())
-      })
+      }),200
 
     except:
       # if error happens, abort
@@ -234,7 +235,7 @@ def create_app(test_config=None):
 
     except:
       # if error happens, abort with 404
-      abort(422)
+      abort(404)
 
   '''
   @TODO: 
@@ -253,9 +254,9 @@ def create_app(test_config=None):
     # get the category by id
     category = Category.query.filter_by(id=id).one_or_none()
 
-    # abort 400 if category isn't found
+    # abort 404 if category isn't found
     if (category is None):
-      abort(400)
+      abort(404)
 
     try: 
       # get the matching questions
@@ -298,11 +299,10 @@ def create_app(test_config=None):
     category = body.get('quiz_category')
 
     # return 400 error if empty
-    if None in [pre_question,category]:
+    if category is None:
       abort(400)
 
     try:
-
       # get all questions by category
       if (category['id'] == 0):
         questions = Question.query.all()
@@ -322,6 +322,7 @@ def create_app(test_config=None):
 
       return jsonify({
           'success': True,
+          'question_id': next_question.id,
           'question': next_question.format(),
       }), 200
     
