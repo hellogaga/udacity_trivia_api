@@ -181,7 +181,7 @@ class TriviaTestCase(unittest.TestCase):
     '''
     # prepare search data
     search_data = {
-      'searchTerm': 'largest lake in Africa',
+      'searchTerm': 'first ever soccer World Cup in 1930',
     }
 
     # make request and process response
@@ -283,7 +283,7 @@ class TriviaTestCase(unittest.TestCase):
       'previous_questions': [16,17],
       'quiz_category': None
       }
-
+    
     # get response
     response = self.client().post('/quizzes', json = request_data)
     data = json.loads(response.data)

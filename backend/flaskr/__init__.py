@@ -34,9 +34,9 @@ def create_app(test_config=None):
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
     return response
 
-  # @app.route('/')
-  # def hello():
-  #   return jsonify({'message':'Hello Yang'})
+  @app.route('/')
+  def hello():
+    return jsonify({'message':'API by hellogaga'})
 
   '''
   @TODO: 
@@ -47,14 +47,18 @@ def create_app(test_config=None):
   @app.route('/categories', methods=['GET'])
   def get_categories():
     categories = Category.query.order_by(Category.id).all()
-    all_categories = [category.format() for category in categories]
 
-    if len(all_categories) == 0:
+    # make a dict to be consistent with front end
+    categories_dict = {}
+    for category in categories:
+      categories_dict[category.id] = category.type
+
+    if len(categories_dict) == 0:
       abort(404)
 
     return jsonify({
       'success': True,
-      'categories': all_categories,
+      'categories': categories_dict,
       'total_categories': len(categories)
     }),200
     
@@ -205,10 +209,11 @@ def create_app(test_config=None):
     '''
     endpoint that returns questions from a search term. 
     '''
-
     # Get search term
     body = request.get_json()
-    search_term = body.get('searchTerm', '')
+    search_term = body.get('searchTerm')
+
+    print(search_term)
 
     # Return 422 status if no search item
     if search_term == None:
@@ -218,6 +223,8 @@ def create_app(test_config=None):
       # get all questions
       search_questions = Question.query.filter(
           Question.question.ilike(f'%{search_term}%')).all()
+      
+      print (search_questions)
 
       # if there are no questions abort with 404
       if len(search_questions) == 0:
@@ -226,10 +233,26 @@ def create_app(test_config=None):
       # paginate
       current_questions = paginate_questions(request, search_questions)
 
+      # Get all categories
+      categories = Category.query.all()
+      categories_dict = {}
+      for category in categories:
+        categories_dict[category.id] = category.type
+    
+      # get current categories
+      current_category_ids=[]
+      for question in search_questions:
+        if question.category not in current_category_ids:
+          current_category_ids.append(question.category)   
+      current_category_dict = {}
+      for id in current_category_ids:
+        current_category_dict[id] = categories_dict[id]
+
       # return response if successful
       return jsonify({
           'success': True,
           'questions': current_questions,
+          'current_category': current_category_dict,
           'total_questions': len(Question.query.all())
       }), 200
 
