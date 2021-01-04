@@ -275,17 +275,27 @@ def create_app(test_config=None):
       def random_question():
         while True:
           next_q = questions[random.randint(0, len(questions)-1)]
-          if next_q.id not in pre_question:
+          if (next_q.id not in pre_question):
             break
         return next_q
       
-      next_question = random_question()
+      if len(pre_question) < len(questions):
+        # if there are questions left
+        next_question = random_question()
+        return jsonify({
+            'success': True,
+            'question_id': next_question.id,
+            'question': next_question.format(),
+        }), 200
+      else:
+        # if there is no questions left
+        next_question=None
+        return jsonify({
+            'success': True,
+            'question_id': '',
+            'question': '',
+        }), 200
 
-      return jsonify({
-          'success': True,
-          'question_id': next_question.id,
-          'question': next_question.format(),
-      }), 200
     
     except:
       # if error
@@ -315,6 +325,14 @@ def create_app(test_config=None):
         "error": 422,
         "message": "unprocessable"
     }), 422
+  
+  @app.errorhandler(500)
+  def internal_server_error(error):
+    return jsonify({
+        'success': False,
+        'error': 500,
+        'message': 'An internal error has occured'
+    }), 500
   
   return app
 

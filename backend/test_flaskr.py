@@ -63,6 +63,19 @@ class TriviaTestCase(unittest.TestCase):
     self.assertEqual(data['success'], True)
     self.assertTrue(data['categories'])
     self.assertEqual(len(data['categories']), 6)
+  
+  def test_get_categories_not_exist(self):
+    '''
+    test get_categories with invalid category number.
+    '''
+    # get data
+    response = self.client().get('/categories/200')
+    data = json.loads(response.data)
+    
+    # make assertation
+    self.assertEqual(response.status_code,404)
+    self.assertEqual(data['success'], False)
+    self.assertEqual(data['message'], 'Not found')
 
   def test_get_question(self):
     '''

@@ -87,6 +87,7 @@ The following errors are defined:
 * 400: Bad request
 * 404: Not found
 * 422: unprocessable
+* 500: An internal error has occured
 
 ### Endpoints
 #### GET /categories
@@ -542,7 +543,7 @@ The following errors are defined:
 #### POST '/quizzes'
 * General
   * search the questions and return questions that has the provided string.
-* Sample on **WINDOWS**: ```curl -d "{\"previous_questions\":[16,17], \"quiz_category\": {\"type\": \"Art\", \"id\": \"2\"}}" -H "Content-Type:application/json" -X POST http://127.0.0.1:5000/quizzes```
+* Sample on **WINDOWS**: ```curl -d "{\"previous_questions\":[16,17,18], \"quiz_category\": {\"type\": \"Art\", \"id\": \"2\"}}" -H "Content-Type:application/json" -X POST http://127.0.0.1:5000/quizzes```
 * Sample on **LINUX**: ```curl -d '{"previous_questions": [16, 17], "quiz_category": {"type": "Art", "id": "2"}}' -H "Content-Type: application/json" -X POST http://127.0.0.1:5000/quizzes ```
 * Response:
 ```json
